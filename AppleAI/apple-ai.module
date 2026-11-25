@@ -1,0 +1,32 @@
+#!name=Apple 智能 / ChatGPT 分流
+#!desc=让 Apple Intelligence 的 relay、Siri 后端与 OpenAI 域名显式走代理，避免被判定为「所在地区不可用」。仅路由，不解密，不含 MITM。
+#!author=AnonyJcy
+#!homepage=https://github.com/AnonyJcy/MyScripts
+
+[Rule]
+# ---- OpenAI / ChatGPT ----
+DOMAIN-SUFFIX,openai.com,PROXY
+DOMAIN-SUFFIX,chatgpt.com,PROXY
+DOMAIN-SUFFIX,chatgpt.livekit.cloud,PROXY
+DOMAIN-SUFFIX,oaistatic.com,PROXY
+DOMAIN-SUFFIX,oaiusercontent.com,PROXY
+
+# ---- Apple Intelligence 后端 ----
+# apple-relay = 私有云计算（Private Cloud Compute）中转
+DOMAIN,apple-relay.apple.com,PROXY
+DOMAIN,apple-relay.cloudflare.com,PROXY
+DOMAIN,apple-relay.fastly-edge.com,PROXY
+# guzzoni = Siri 后端；直连时会被解析到国内节点（实测腾讯云北京），故需要走代理
+DOMAIN,guzzoni.apple.com,PROXY
+# smoot / ls.apple.com = Siri 与「App Store / Spotlight」相关探测
+DOMAIN-SUFFIX,smoot.apple.com,PROXY
+DOMAIN,gspe1-ssl.ls.apple.com,PROXY
+# Cloudflare PCC 相关
+DOMAIN,cp4.cloudflare.com,PROXY
+
+# 说明：
+# 1) 使用 lazy_group.conf 这类带策略组的配置时，把上面的 PROXY 换成 AI（专用策略组），
+#    即可单独给 AI 流量指定节点。
+# 2) 节点地区必须在 OpenAI 支持范围内：美国 / 日本 / 新加坡等；
+#    香港、澳门不支持，会直接提示「ChatGPT 在你所在地区不可用」。
+# 3) 若启用后发现 Siri 中文服务异常或变慢，删掉 guzzoni.apple.com 那一条再试。
